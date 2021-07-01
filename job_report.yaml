@@ -72,10 +72,21 @@
         cmd1_saved_results: "{{ cmd1_results }}"
 
   post_tasks:
+  
+    - name: Mark surviving hosts as 'successful' or 'Failed'
+      block:
+      - name: Mark surviving hosts as 'successful'
+        set_fact:
+          job_success: True
+        when: cmd1_saved_results.rc == 0
 
-    - name: Mark surviving hosts as 'successful'
-      set_fact:
-        job_success: True
+      rescue:
+      - name: Mark surviving hosts as 'Failed'
+        set_fact:
+          job_success: False
+
+
+
 
     # Saving curated lists of hosts as localhost facts, to make the Jinja loops easier to read in the template. 
     # To use: hostvars['localhost']['success_list'] , etc
